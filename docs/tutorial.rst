@@ -389,6 +389,33 @@ Using DataTables via POST method
 By default, the Ajax request that DataTables makes to obtain server-side processing data is an HTTP GET request.
 However, there are times when you might wish to use POST, DRF-Datatables can handle this, just configure your Datatable as explained in the `related Datatables documentation section <https://datatables.net/examples/server_side/post.html>`_.
 
+**Note:** Depending on your `CSRF Protection settings <https://docs.djangoproject.com/en/5.1/ref/csrf/>`_, Django might require a CSRF token to authorize any `POST` call. You might need to inject that token on the POST call from the client-side.
+
+.. code:: html
+
+    <html>
+    ...
+    <!-- csrf token tag somewhere in your template -->
+    {% csrf_token %}
+    </html>
+    <script>
+    const token = $('input[name="csrfmiddlewaretoken"]').val();
+    const extraData = (data) => {
+        // Add the CSRF token to the data form so it's not blocked by Django
+        data.csrfmiddlewaretoken = token;
+        return data;
+    };
+    const table = new DataTable({
+        // ... your table params
+        ajax: {
+            url: '/api/url?format=datatables',
+            method: 'POST',
+            data: extraData,
+        },
+      });
+    </script>
+    </html>
+
 
 Handling Duplicates in Sorting
 ------------------------------
